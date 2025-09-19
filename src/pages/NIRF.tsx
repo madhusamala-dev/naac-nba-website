@@ -3,127 +3,157 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
-  TrendingUp, 
+  CheckCircle, 
   BookOpen, 
-  FlaskConical, 
-  GraduationCap, 
   Users, 
-  Eye,
-  BarChart3,
-  Calendar,
+  Lightbulb, 
+  Building, 
+  TrendingUp, 
+  Shield, 
+  Heart,
   FileText,
+  Database,
+  BarChart3,
+  UserCheck,
+  ArrowRight,
+  Award,
   Target,
+  Settings,
   Presentation,
-  ClipboardCheck,
   HelpCircle,
+  ClipboardCheck,
   Trophy,
   Star,
+  Clock,
   Zap,
-  Award
+  GraduationCap,
+  DollarSign
 } from 'lucide-react';
 
 export default function NIRF() {
-  const nirfParameters = [
+  const parameters = [
     {
-      title: 'Teaching, Learning & Resources',
+      title: 'Teaching, Learning & Resources (TLR)',
       description: 'Faculty-student ratio, faculty qualifications, and financial resources',
-      icon: BookOpen,
-      color: 'bg-purple-500'
-    },
-    {
-      title: 'Research and Professional Practice',
-      description: 'Publications, patents, research projects, and professional practice',
-      icon: FlaskConical,
-      color: 'bg-blue-500'
-    },
-    {
-      title: 'Graduation Outcomes',
-      description: 'Graduate employment, higher studies, and entrepreneurship outcomes',
       icon: GraduationCap,
-      color: 'bg-green-500'
+      color: 'bg-purple-500',
+      weight: '30%'
     },
     {
-      title: 'Outreach and Inclusivity',
-      description: 'Regional diversity, women participation, and economically disadvantaged students',
+      title: 'Research and Professional Practice (RP)',
+      description: 'Publications, patents, research projects, and professional practice',
+      icon: Lightbulb,
+      color: 'bg-blue-500',
+      weight: '30%'
+    },
+    {
+      title: 'Graduation Outcomes (GO)',
+      description: 'Graduate employment, higher studies, and entrepreneurship metrics',
       icon: Users,
-      color: 'bg-orange-500'
+      color: 'bg-green-500',
+      weight: '20%'
     },
     {
-      title: 'Perception',
-      description: 'Academic peer review and employer perception scores',
-      icon: Eye,
-      color: 'bg-teal-500'
+      title: 'Outreach and Inclusivity (OI)',
+      description: 'Diversity, regional diversity, and economically disadvantaged students',
+      icon: Heart,
+      color: 'bg-orange-500',
+      weight: '10%'
+    },
+    {
+      title: 'Perception (PR)',
+      description: 'Academic and employer perception through surveys and feedback',
+      icon: Star,
+      color: 'bg-indigo-500',
+      weight: '10%'
     }
   ];
 
-  const keyFeatures = [
+  const features = [
     {
-      title: 'Ranking Simulation Dashboard',
-      description: 'Real-time NIRF score calculation and ranking prediction based on your data',
-      icon: BarChart3,
-      color: 'text-purple-600 bg-purple-50'
+      title: 'NIRF Data Collection Portal',
+      description: 'Automated data collection system aligned with NIRF parameters and metrics',
+      icon: Database
     },
     {
-      title: 'Year-on-Year Comparison',
-      description: 'Track your performance trends and identify improvement areas over multiple years',
-      icon: Calendar,
-      color: 'text-blue-600 bg-blue-50'
+      title: 'Ranking Simulation Engine',
+      description: 'Predict your NIRF ranking based on current data and identify improvement areas',
+      icon: BarChart3
     },
     {
-      title: 'Parameter-wise Data Templates',
-      description: 'Structured templates for all NIRF parameters with automated calculations',
-      icon: FileText,
-      color: 'text-green-600 bg-green-50'
+      title: 'Parameter-wise Analytics',
+      description: 'Detailed analysis of performance across all five NIRF parameters',
+      icon: Target
     },
     {
-      title: 'Improvement Strategy Planner',
-      description: 'AI-powered recommendations to boost your NIRF ranking systematically',
-      icon: Target,
-      color: 'text-orange-600 bg-orange-50'
+      title: 'Benchmarking Dashboard',
+      description: 'Compare your performance with peer institutions and top-ranked colleges',
+      icon: TrendingUp
     }
   ];
 
   const supportServices = [
     {
-      title: 'Data Preparation Workshops',
-      description: 'Comprehensive training on NIRF data collection and validation processes',
+      title: 'Data Validation Workshops',
+      description: 'Training sessions on accurate data collection and validation for NIRF submission',
       icon: Presentation
     },
     {
-      title: 'Mock Ranking Evaluation',
-      description: 'Simulated NIRF evaluation with expert feedback and improvement suggestions',
+      title: 'Ranking Strategy Consultation',
+      description: 'Expert consultation on strategic improvements to boost NIRF ranking',
       icon: ClipboardCheck
     },
     {
-      title: 'Strategic Consultation',
-      description: 'Expert guidance on long-term strategies to improve NIRF ranking',
+      title: 'Submission Support',
+      description: 'Technical assistance during NIRF data submission and verification process',
       icon: HelpCircle
+    }
+  ];
+
+  const processSteps = [
+    {
+      title: 'Current Ranking Analysis',
+      description: 'Comprehensive analysis of current position and performance gaps',
+      icon: BarChart3,
+      color: 'bg-purple-500'
+    },
+    {
+      title: 'Strategic Planning',
+      description: 'Development of targeted improvement strategies for each parameter',
+      icon: Target,
+      color: 'bg-blue-500'
+    },
+    {
+      title: 'Implementation & Monitoring',
+      description: 'Execution of improvement plans with continuous monitoring and optimization',
+      icon: TrendingUp,
+      color: 'bg-green-500'
     }
   ];
 
   const successMetrics = [
     {
-      number: '30+',
+      number: '60+',
       label: 'Institutions Ranked',
       icon: Trophy,
       color: 'bg-purple-500'
     },
     {
-      number: '75%',
-      label: 'Ranking Improvement',
+      number: '45',
+      label: 'Average Rank Improvement',
       icon: TrendingUp,
       color: 'bg-blue-500'
     },
     {
-      number: '50+',
-      label: 'Average Position Jump',
-      icon: Zap,
+      number: '85%',
+      label: 'Ranking Success Rate',
+      icon: Star,
       color: 'bg-green-500'
     },
     {
-      number: '95%',
-      label: 'Data Accuracy Rate',
-      icon: Award,
+      number: '3 Months',
+      label: 'Average Turnaround',
+      icon: Clock,
       color: 'bg-orange-500'
     }
   ];
@@ -135,20 +165,21 @@ export default function NIRF() {
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-4xl text-center">
             <Badge className="mb-6 bg-purple-100 text-purple-800 hover:bg-purple-200">
-              NIRF Ranking Excellence
+              NIRF Ranking Services
             </Badge>
             <h1 className="mb-6 text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-              Boost Your{' '}
-              <span className="bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent">
+              Improve Your{' '}
+              <span className="bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
                 NIRF Ranking
-              </span>
+              </span>{' '}
+              Strategically
             </h1>
             <p className="mb-8 text-xl text-gray-600 sm:text-2xl">
-              Data-driven insights to improve performance year over year with strategic planning and expert guidance.
+              Data-driven approach to enhance your National Institutional Ranking Framework position with expert guidance.
             </p>
             <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
               <Button size="lg" asChild className="text-lg px-8 py-3 bg-purple-600 hover:bg-purple-700">
-                <Link to="/contact">Request Demo</Link>
+                <Link to="/request-demo">Request a Demo</Link>
               </Button>
               <Button size="lg" variant="outline" asChild className="text-lg px-8 py-3 border-purple-600 text-purple-600 hover:bg-purple-50">
                 <Link to="/precheck">Start Pre-Check</Link>
@@ -158,24 +189,29 @@ export default function NIRF() {
         </div>
       </section>
 
-      {/* NIRF Parameters */}
+      {/* NIRF Parameters Coverage */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-6xl">
             <div className="text-center mb-16">
-              <h2 className="mb-4 text-3xl font-bold text-gray-900 sm:text-4xl">NIRF Parameters</h2>
-              <p className="text-xl text-gray-600">Comprehensive coverage of all five NIRF ranking parameters</p>
+              <h2 className="mb-4 text-3xl font-bold text-gray-900 sm:text-4xl">NIRF Parameters Coverage</h2>
+              <p className="text-xl text-gray-600">Comprehensive support for all five NIRF ranking parameters</p>
             </div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {nirfParameters.map((parameter, index) => {
+              {parameters.map((parameter, index) => {
                 const Icon = parameter.icon;
                 return (
-                  <Card key={index} className="group hover:shadow-lg transition-all duration-300 h-full">
+                  <Card key={index} className="group hover:shadow-lg transition-all duration-300">
                     <CardHeader>
-                      <div className={`w-12 h-12 ${parameter.color} rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                        <Icon className="w-6 h-6 text-white" />
+                      <div className="flex items-center justify-between mb-4">
+                        <div className={`w-12 h-12 ${parameter.color} rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                          <Icon className="w-6 h-6 text-white" />
+                        </div>
+                        <Badge variant="secondary" className="text-xs">
+                          {parameter.weight}
+                        </Badge>
                       </div>
-                      <CardTitle className="text-lg leading-tight">{parameter.title}</CardTitle>
+                      <CardTitle className="text-lg">{parameter.title}</CardTitle>
                       <CardDescription className="text-sm">{parameter.description}</CardDescription>
                     </CardHeader>
                   </Card>
@@ -192,17 +228,19 @@ export default function NIRF() {
           <div className="mx-auto max-w-6xl">
             <div className="text-center mb-16">
               <h2 className="mb-4 text-3xl font-bold text-gray-900 sm:text-4xl">Key Features</h2>
-              <p className="text-xl text-gray-600">Advanced tools to boost your NIRF ranking systematically</p>
+              <p className="text-xl text-gray-600">Advanced tools for NIRF ranking improvement</p>
             </div>
             <div className="grid gap-8 md:grid-cols-2">
-              {keyFeatures.map((feature, index) => {
+              {features.map((feature, index) => {
                 const Icon = feature.icon;
                 return (
-                  <Card key={index} className="hover:shadow-md transition-shadow">
-                    <CardContent className="p-6">
+                  <Card key={index} className="group hover:shadow-lg transition-all duration-300">
+                    <CardContent className="p-8">
                       <div className="flex items-start space-x-4">
-                        <div className={`p-3 rounded-lg ${feature.color}`}>
-                          <Icon className="w-6 h-6" />
+                        <div className="flex-shrink-0">
+                          <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+                            <Icon className="w-6 h-6 text-purple-600" />
+                          </div>
                         </div>
                         <div className="flex-1">
                           <h3 className="text-xl font-semibold text-gray-900 mb-2">{feature.title}</h3>
@@ -218,43 +256,29 @@ export default function NIRF() {
         </div>
       </section>
 
-      {/* Process Flow */}
-      <section className="py-20 bg-white">
+      {/* Process Overview */}
+      <section className="py-20 bg-purple-600">
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-6xl">
             <div className="text-center mb-16">
-              <h2 className="mb-4 text-3xl font-bold text-gray-900 sm:text-4xl">Our NIRF Process</h2>
-              <p className="text-xl text-gray-600">Strategic approach to improve your NIRF ranking</p>
+              <h2 className="mb-4 text-3xl font-bold text-white sm:text-4xl">Our NIRF Process</h2>
+              <p className="text-xl text-purple-100">Strategic approach to ranking improvement</p>
             </div>
-            <div className="grid gap-8 md:grid-cols-4">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl font-bold text-purple-600">1</span>
-                </div>
-                <h3 className="text-lg font-semibold mb-2">Current Ranking Analysis</h3>
-                <p className="text-gray-600 text-sm">Comprehensive assessment of your current NIRF performance and position</p>
-              </div>
-              <div className="text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl font-bold text-blue-600">2</span>
-                </div>
-                <h3 className="text-lg font-semibold mb-2">Data Collection & Validation</h3>
-                <p className="text-gray-600 text-sm">Systematic data gathering with accuracy verification for all parameters</p>
-              </div>
-              <div className="text-center">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl font-bold text-green-600">3</span>
-                </div>
-                <h3 className="text-lg font-semibold mb-2">Strategy Development</h3>
-                <p className="text-gray-600 text-sm">Customized improvement strategy with actionable recommendations</p>
-              </div>
-              <div className="text-center">
-                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl font-bold text-orange-600">4</span>
-                </div>
-                <h3 className="text-lg font-semibold mb-2">Implementation & Monitoring</h3>
-                <p className="text-gray-600 text-sm">Continuous support for strategy implementation and progress tracking</p>
-              </div>
+            <div className="grid gap-8 md:grid-cols-3">
+              {processSteps.map((step, index) => {
+                const Icon = step.icon;
+                return (
+                  <Card key={index} className="bg-white/10 backdrop-blur border-white/20 hover:bg-white/20 transition-all duration-300">
+                    <CardContent className="p-8 text-center">
+                      <div className={`w-16 h-16 ${step.color} rounded-full flex items-center justify-center mx-auto mb-6`}>
+                        <Icon className="w-8 h-8 text-white" />
+                      </div>
+                      <h3 className="text-xl font-semibold text-white mb-4">{step.title}</h3>
+                      <p className="text-purple-100">{step.description}</p>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -266,7 +290,7 @@ export default function NIRF() {
           <div className="mx-auto max-w-6xl">
             <div className="text-center mb-16">
               <h2 className="mb-4 text-3xl font-bold text-gray-900 sm:text-4xl">Support Services</h2>
-              <p className="text-xl text-gray-600">Expert guidance throughout your NIRF improvement journey</p>
+              <p className="text-xl text-gray-600">Expert guidance for NIRF ranking success</p>
             </div>
             <div className="grid gap-8 md:grid-cols-3">
               {supportServices.map((service, index) => {
@@ -289,24 +313,24 @@ export default function NIRF() {
       </section>
 
       {/* Success Metrics */}
-      <section className="py-20 bg-purple-600">
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-6xl">
             <div className="text-center mb-16">
-              <h2 className="mb-4 text-3xl font-bold text-white sm:text-4xl">NIRF Success Metrics</h2>
-              <p className="text-xl text-purple-100">Our proven track record in NIRF ranking improvement</p>
+              <h2 className="mb-4 text-3xl font-bold text-gray-900 sm:text-4xl">NIRF Success Metrics</h2>
+              <p className="text-xl text-gray-600">Proven results in ranking improvements</p>
             </div>
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
               {successMetrics.map((metric, index) => {
                 const Icon = metric.icon;
                 return (
-                  <Card key={index} className="bg-white/10 backdrop-blur border-white/20 hover:bg-white/20 transition-all duration-300">
-                    <CardContent className="p-6 text-center">
+                  <Card key={index} className="text-center hover:shadow-lg transition-all duration-300">
+                    <CardContent className="p-6">
                       <div className={`w-16 h-16 ${metric.color} rounded-full flex items-center justify-center mx-auto mb-4`}>
                         <Icon className="w-8 h-8 text-white" />
                       </div>
-                      <div className="text-4xl font-bold text-white mb-2">{metric.number}</div>
-                      <div className="text-purple-100 font-medium">{metric.label}</div>
+                      <div className="text-4xl font-bold text-gray-900 mb-2">{metric.number}</div>
+                      <div className="text-gray-600 font-medium">{metric.label}</div>
                     </CardContent>
                   </Card>
                 );
@@ -317,20 +341,20 @@ export default function NIRF() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-indigo-800 to-purple-900">
+      <section className="py-20 bg-gradient-to-r from-slate-800 to-slate-900">
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-4xl text-center">
             <h2 className="mb-4 text-3xl font-bold text-white sm:text-4xl">
-              Ready to Boost Your NIRF Ranking?
+              Ready to Improve Your NIRF Ranking?
             </h2>
-            <p className="mb-8 text-xl text-indigo-200">
-              Join 30+ institutions that have significantly improved their NIRF rankings with our data-driven approach.
+            <p className="mb-8 text-xl text-slate-300">
+              Join 60+ institutions that have enhanced their NIRF rankings with our strategic approach and expert guidance.
             </p>
             <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
               <Button size="lg" asChild className="text-lg px-8 py-3 bg-purple-600 hover:bg-purple-700">
-                <Link to="/contact">Request Demo</Link>
+                <Link to="/request-demo">Request Demo</Link>
               </Button>
-              <Button size="lg" variant="outline" asChild className="text-lg px-8 py-3 border-white text-purple-800 bg-white hover:bg-gray-100">
+              <Button size="lg" variant="outline" asChild className="text-lg px-8 py-3 border-white text-slate-800 bg-white hover:bg-gray-100">
                 <Link to="/precheck">Start Pre-Check</Link>
               </Button>
             </div>

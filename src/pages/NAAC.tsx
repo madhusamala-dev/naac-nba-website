@@ -22,9 +22,10 @@ import {
   Presentation,
   HelpCircle,
   ClipboardCheck,
-  GraduationCap,
   Trophy,
-  Clock
+  Star,
+  Clock,
+  Zap
 } from 'lucide-react';
 
 export default function NAAC() {
@@ -139,13 +140,13 @@ export default function NAAC() {
     {
       number: '85+',
       label: 'Colleges Accredited',
-      icon: GraduationCap,
+      icon: Trophy,
       color: 'bg-blue-500'
     },
     {
       number: '92%',
       label: 'A Grade Achievement',
-      icon: Trophy,
+      icon: Star,
       color: 'bg-green-500'
     },
     {
@@ -183,7 +184,7 @@ export default function NAAC() {
             </p>
             <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
               <Button size="lg" asChild className="text-lg px-8 py-3">
-                <Link to="/contact">Request a Demo</Link>
+                <Link to="/request-demo">Request a Demo</Link>
               </Button>
               <Button size="lg" variant="outline" asChild className="text-lg px-8 py-3">
                 <Link to="/precheck">Start Pre-Check</Link>
@@ -324,7 +325,7 @@ export default function NAAC() {
                 const Icon = metric.icon;
                 return (
                   <Card key={index} className="text-center hover:shadow-lg transition-all duration-300">
-                    <CardContent className="p-8">
+                    <CardContent className="p-6">
                       <div className={`w-16 h-16 ${metric.color} rounded-full flex items-center justify-center mx-auto mb-4`}>
                         <Icon className="w-8 h-8 text-white" />
                       </div>
@@ -351,7 +352,7 @@ export default function NAAC() {
             </p>
             <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
               <Button size="lg" asChild className="text-lg px-8 py-3 bg-blue-600 hover:bg-blue-700">
-                <Link to="/contact">Request Demo</Link>
+                <Link to="/request-demo">Request Demo</Link>
               </Button>
               <Button size="lg" variant="outline" asChild className="text-lg px-8 py-3 border-white text-slate-800 bg-white hover:bg-gray-100">
                 <Link to="/precheck">Start Pre-Check</Link>
