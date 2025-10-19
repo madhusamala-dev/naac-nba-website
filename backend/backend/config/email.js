@@ -1,16 +1,17 @@
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 
-// Email transporter configuration
+// Email transporter configuration for Microsoft Outlook
 const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-  port: process.env.EMAIL_PORT || 587,
+  host: 'smtp-mail.outlook.com',
+  port: 587,
   secure: false, // true for 465, false for other ports
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASSWORD
   },
   tls: {
+    ciphers: 'SSLv3',
     rejectUnauthorized: false
   }
 });
@@ -19,10 +20,15 @@ const transporter = nodemailer.createTransport({
 async function verifyEmailConfig() {
   try {
     await transporter.verify();
-    console.log('✅ Email configuration verified');
+    console.log('✅ Outlook email configuration verified');
     return true;
   } catch (error) {
-    console.error('❌ Email configuration failed:', error.message);
+    console.error('❌ Outlook email configuration failed:', error.message);
+    console.log('💡 To fix Outlook email:');
+    console.log('   1. Use your full Outlook email address as EMAIL_USER');
+    console.log('   2. Use your Outlook password as EMAIL_PASSWORD');
+    console.log('   3. Enable "Less secure app access" if using basic auth');
+    console.log('   4. Or use App Password for Microsoft 365 accounts');
     return false;
   }
 }
@@ -39,10 +45,10 @@ async function sendEmail({ to, subject, html, text }) {
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log('✅ Email sent successfully:', info.messageId);
+    console.log('✅ Email sent successfully via Outlook:', info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error('❌ Email sending failed:', error.message);
+    console.error('❌ Outlook email sending failed:', error.message);
     return { success: false, error: error.message };
   }
 }

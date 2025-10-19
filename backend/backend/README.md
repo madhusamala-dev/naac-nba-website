@@ -1,12 +1,12 @@
 # NAAC NBA Services Backend API
 
-This is the backend API for the NAAC NBA Services website, handling form submissions, database operations, and email notifications.
+This is the backend API for the NAAC NBA Services website, handling form submissions, database operations, and email notifications via Microsoft Outlook.
 
 ## Features
 
 - **Demo Request Management**: Handle demo request form submissions with email notifications
 - **Contact Form Processing**: Process contact form submissions
-- **Email Notifications**: Automated email confirmations and admin notifications
+- **Microsoft Outlook Email**: Automated email confirmations and admin notifications via Outlook
 - **MySQL Database**: Persistent data storage with proper indexing
 - **CORS Support**: Cross-origin requests from frontend
 - **Error Handling**: Comprehensive error handling and logging
@@ -15,7 +15,7 @@ This is the backend API for the NAAC NBA Services website, handling form submiss
 
 - **Node.js** with Express.js
 - **MySQL** for database
-- **Nodemailer** for email sending
+- **Nodemailer** with Microsoft Outlook SMTP
 - **JWT** for future authentication
 - **bcryptjs** for password hashing (future use)
 
@@ -25,13 +25,13 @@ This is the backend API for the NAAC NBA Services website, handling form submiss
 
 1. **Node.js** (v16 or higher)
 2. **MySQL** server running locally
-3. **Gmail account** for email sending (or other SMTP service)
+3. **Microsoft Outlook account** for email sending
 
 ### Installation
 
 1. **Install dependencies:**
    ```bash
-   cd backend
+   cd backend/backend
    npm install
    ```
 
@@ -46,11 +46,11 @@ This is the backend API for the NAAC NBA Services website, handling form submiss
    DB_NAME=naac_nba_db
    DB_PORT=3306
 
-   # Email Configuration (Gmail example)
-   EMAIL_HOST=smtp.gmail.com
+   # Microsoft Outlook Email Configuration
+   EMAIL_HOST=smtp-mail.outlook.com
    EMAIL_PORT=587
-   EMAIL_USER=your-email@gmail.com
-   EMAIL_PASSWORD=your-app-password
+   EMAIL_USER=your-email@outlook.com
+   EMAIL_PASSWORD=your-outlook-password
    ADMIN_EMAIL=madhusamala.trainer@gmail.com
 
    # Server Configuration
@@ -58,11 +58,11 @@ This is the backend API for the NAAC NBA Services website, handling form submiss
    NODE_ENV=development
    ```
 
-3. **Set up Gmail App Password:**
-   - Go to Google Account settings
-   - Enable 2-factor authentication
-   - Generate an App Password for this application
-   - Use the App Password in `EMAIL_PASSWORD`
+3. **Set up Microsoft Outlook Email:**
+   - Use your Outlook email address in `EMAIL_USER`
+   - Use your Outlook password in `EMAIL_PASSWORD`
+   - For Microsoft 365 accounts, create an App Password
+   - See `SETUP_OUTLOOK.md` for detailed instructions
 
 4. **Start the server:**
    ```bash
@@ -76,6 +76,7 @@ This is the backend API for the NAAC NBA Services website, handling form submiss
 5. **Verify setup:**
    - Visit `http://localhost:5000/health` to check server status
    - Database tables will be created automatically
+   - Check console for email configuration verification
 
 ## API Endpoints
 
@@ -153,6 +154,37 @@ Content-Type: application/json
 GET /health
 ```
 
+## Email Configuration
+
+### Microsoft Outlook Setup
+
+The system is configured to use Microsoft Outlook SMTP:
+
+- **SMTP Server**: `smtp-mail.outlook.com`
+- **Port**: 587 (STARTTLS)
+- **Authentication**: Username/Password or App Password
+
+### Email Templates
+
+The system sends two types of emails for demo requests:
+
+1. **Confirmation Email** to the user acknowledging their request
+2. **Notification Email** to admin (`madhusamala.trainer@gmail.com`) with request details
+
+Both emails are professionally formatted with HTML templates optimized for Outlook.
+
+### Troubleshooting Email Issues
+
+If emails are not sending:
+
+1. **Check Outlook credentials** in `.env` file
+2. **Verify account security settings** - enable "Less secure app access" if needed
+3. **Use App Password** for Microsoft 365 accounts
+4. **Check console logs** for detailed error messages
+5. **Test with simple email client** first
+
+See `SETUP_OUTLOOK.md` for comprehensive email setup guide.
+
 ## Database Schema
 
 ### request_demo Table
@@ -186,21 +218,13 @@ CREATE TABLE contacts (
 );
 ```
 
-## Email Templates
-
-The system sends two types of emails for demo requests:
-
-1. **Confirmation Email** to the user acknowledging their request
-2. **Notification Email** to admin (`madhusamala.trainer@gmail.com`) with request details
-
-Both emails are professionally formatted with HTML templates.
-
 ## Error Handling
 
 - **Validation Errors**: 400 status with specific error messages
 - **Not Found**: 404 status for missing resources
 - **Server Errors**: 500 status with error logging
 - **Email Failures**: Graceful handling with status reporting
+- **Database Failures**: Fallback to email-only mode
 
 ## Security Features
 
@@ -208,6 +232,7 @@ Both emails are professionally formatted with HTML templates.
 - **SQL Injection Protection**: Parameterized queries
 - **CORS Configuration**: Restricted origins
 - **Error Sanitization**: No sensitive data in production error responses
+- **Rate Limiting**: Prevent email spam (can be implemented)
 
 ## Development
 
@@ -220,7 +245,7 @@ This uses `nodemon` for automatic server restart on file changes.
 
 ### Testing Emails
 
-1. Use a real Gmail account with App Password
+1. Use a real Outlook account with proper credentials
 2. Test with the `/health` endpoint first
 3. Check console logs for email sending status
 4. Verify emails in both sender and recipient inboxes
@@ -241,7 +266,8 @@ NODE_ENV=production
 DB_HOST=your-cloud-db-host
 DB_USER=your-db-user
 DB_PASSWORD=your-secure-password
-EMAIL_USER=your-production-email@domain.com
+EMAIL_HOST=smtp-mail.outlook.com
+EMAIL_USER=your-production-email@outlook.com
 EMAIL_PASSWORD=your-secure-app-password
 ```
 
@@ -261,10 +287,11 @@ When moving to cloud database:
    - Verify credentials in `.env`
    - Check port 3306 is accessible
 
-2. **Email Not Sending**
-   - Verify Gmail App Password is correct
-   - Check 2-factor authentication is enabled
-   - Ensure `EMAIL_USER` and `EMAIL_PASSWORD` are correct
+2. **Outlook Email Not Sending**
+   - Verify Outlook credentials are correct
+   - Check if 2FA is enabled (use App Password)
+   - Ensure "Less secure app access" is enabled if needed
+   - Try alternative SMTP settings (see SETUP_OUTLOOK.md)
 
 3. **CORS Errors**
    - Update CORS origins in `server.js`
@@ -277,9 +304,21 @@ All important operations are logged to console:
 - ❌ Error operations (red X)
 - Database connections, email sending, request processing
 
+## Alternative Email Providers
+
+If Outlook doesn't work for your use case:
+
+1. **SendGrid** (Recommended for production)
+2. **Amazon SES**
+3. **Mailgun**
+4. **Gmail** (with App Passwords)
+5. **Postmark**
+
 ## Support
 
 For issues or questions:
 - Check the console logs for detailed error messages
 - Verify all environment variables are set correctly
 - Test individual components (database, email) separately
+- Review `SETUP_OUTLOOK.md` for email-specific issues
+- Check Microsoft Outlook SMTP documentation
