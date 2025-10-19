@@ -2,7 +2,7 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 // Email transporter configuration for Microsoft Outlook
-const transporter = nodemailer.createTransport({
+const transporter = nodemailer.createTransporter({
   host: 'smtp-mail.outlook.com',
   port: 587,
   secure: false, // true for 465, false for other ports
@@ -206,6 +206,185 @@ const emailTemplates = {
       - Submitted At: ${new Date().toLocaleString()}
       
       Please respond within 24 hours.
+    `
+  }),
+
+  nirfAssessmentResults: (data) => ({
+    subject: `Your NIRF Readiness Assessment Results - ${data.institution_name}`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>NIRF Assessment Results</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+          .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+          .score-box { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; border-left: 4px solid #4f46e5; text-align: center; }
+          .info-box { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; border-left: 4px solid #10b981; }
+          .footer { text-align: center; margin-top: 30px; color: #666; font-size: 14px; }
+          .score { font-size: 36px; font-weight: bold; color: #4f46e5; }
+          .readiness { font-size: 18px; font-weight: bold; color: #10b981; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>🏆 NIRF Readiness Assessment Results</h1>
+            <p>Your institution's comprehensive readiness analysis</p>
+          </div>
+          <div class="content">
+            <p>Dear ${data.contact_name},</p>
+            
+            <p>Thank you for completing the NIRF Readiness Assessment for <strong>${data.institution_name}</strong>. Here are your detailed results:</p>
+            
+            <div class="score-box">
+              <div class="score">${data.percentage}%</div>
+              <p>Overall NIRF Readiness Score</p>
+              <p style="color: #666; font-size: 14px;">${data.total_score}/50 points</p>
+            </div>
+            
+            <div class="info-box">
+              <h3>Assessment Summary:</h3>
+              <p><strong>Institution:</strong> ${data.institution_name}</p>
+              <p><strong>Readiness Level:</strong> <span class="readiness">${data.readiness_level}</span></p>
+              <p><strong>Potential Ranking Band:</strong> ${data.rank_band}</p>
+              <p><strong>Assessment Date:</strong> ${new Date().toLocaleDateString()}</p>
+            </div>
+            
+            <div class="info-box">
+              <h3>Next Steps:</h3>
+              <ul>
+                <li>Review the detailed recommendations in your assessment report</li>
+                <li>Focus on improving areas with lower scores</li>
+                <li>Consider our expert consultation services for targeted improvements</li>
+                <li>Implement systematic changes to enhance your NIRF ranking potential</li>
+              </ul>
+            </div>
+            
+            <div style="background: #eff6ff; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
+              <h3 style="color: #1e40af;">Ready to Improve Your Ranking?</h3>
+              <p>Our experts can help you implement targeted improvements to enhance your NIRF ranking.</p>
+              <p style="margin: 15px 0;">
+                <a href="mailto:${process.env.ADMIN_EMAIL}?subject=NIRF Consultation Request - ${data.institution_name}" 
+                   style="background: #1e40af; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                  Schedule Expert Consultation
+                </a>
+              </p>
+            </div>
+            
+            <p>If you have any questions about your results or would like to discuss improvement strategies, please don't hesitate to contact us.</p>
+            
+            <p>Best regards,<br>
+            <strong>NAAC NBA Services Team</strong></p>
+          </div>
+          <div class="footer">
+            <p>This assessment is based on your responses and provides indicative guidance for NIRF preparation.</p>
+            <p>© 2024 NAAC NBA Services. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+    text: `
+      NIRF Readiness Assessment Results - ${data.institution_name}
+      
+      Dear ${data.contact_name},
+      
+      Thank you for completing the NIRF Readiness Assessment. Here are your results:
+      
+      Overall Score: ${data.percentage}% (${data.total_score}/50 points)
+      Readiness Level: ${data.readiness_level}
+      Potential Ranking Band: ${data.rank_band}
+      
+      Institution: ${data.institution_name}
+      Assessment Date: ${new Date().toLocaleDateString()}
+      
+      Our experts can help you improve your ranking potential. Contact us for a consultation.
+      
+      Best regards,
+      NAAC NBA Services Team
+    `
+  }),
+
+  nirfAssessmentNotification: (data) => ({
+    subject: `New NIRF Assessment - ${data.institution_name} (${data.percentage}% Score)`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>New NIRF Assessment</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: #7c3aed; color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; }
+          .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+          .info-box { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; border-left: 4px solid #7c3aed; }
+          .score-highlight { background: #eff6ff; padding: 15px; border-radius: 8px; text-align: center; margin: 15px 0; }
+          .score { font-size: 24px; font-weight: bold; color: #1e40af; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>📊 New NIRF Assessment Completed</h1>
+            <p>A new institution has completed the readiness assessment</p>
+          </div>
+          <div class="content">
+            <div class="score-highlight">
+              <div class="score">${data.percentage}% Overall Score</div>
+              <p>${data.readiness_level}</p>
+            </div>
+            
+            <div class="info-box">
+              <h3>Assessment Details:</h3>
+              <p><strong>Institution:</strong> ${data.institution_name}</p>
+              <p><strong>Contact Person:</strong> ${data.contact_name}</p>
+              <p><strong>Email:</strong> <a href="mailto:${data.contact_email}">${data.contact_email}</a></p>
+              <p><strong>Phone:</strong> ${data.contact_number || 'Not provided'}</p>
+              <p><strong>Total Score:</strong> ${data.total_score}/50 points</p>
+              <p><strong>Readiness Level:</strong> ${data.readiness_level}</p>
+              <p><strong>Rank Band:</strong> ${data.rank_band}</p>
+              <p><strong>Completed At:</strong> ${new Date().toLocaleString()}</p>
+            </div>
+            
+            <div class="info-box">
+              <h3>Recommended Actions:</h3>
+              <ul>
+                <li>Review the detailed assessment responses</li>
+                <li>Contact the institution within 24 hours</li>
+                <li>Prepare customized improvement recommendations</li>
+                <li>Schedule a consultation call if score indicates potential</li>
+                <li>Send relevant service information based on their needs</li>
+              </ul>
+            </div>
+            
+            ${data.percentage >= 60 ? `
+            <div style="background: #d1fae5; padding: 15px; border-radius: 8px; margin: 15px 0;">
+              <strong>🎯 High Potential Lead:</strong> This institution shows strong NIRF readiness. Priority follow-up recommended.
+            </div>
+            ` : ''}
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+    text: `
+      New NIRF Assessment Completed - ${data.institution_name}
+      
+      Assessment Summary:
+      - Institution: ${data.institution_name}
+      - Contact: ${data.contact_name} (${data.contact_email})
+      - Phone: ${data.contact_number || 'Not provided'}
+      - Score: ${data.percentage}% (${data.total_score}/50 points)
+      - Readiness Level: ${data.readiness_level}
+      - Rank Band: ${data.rank_band}
+      - Completed: ${new Date().toLocaleString()}
+      
+      Please follow up within 24 hours.
     `
   })
 };

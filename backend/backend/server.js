@@ -8,6 +8,7 @@ const { verifyEmailConfig } = require('./config/email');
 // Import routes
 const demoRoutes = require('./routes/demo');
 const contactRoutes = require('./routes/contact');
+const nirfRoutes = require('./routes/nirf');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -57,6 +58,7 @@ app.get('/health', (req, res) => {
 // API Routes
 app.use('/api/demo', demoRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/nirf', nirfRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -69,7 +71,10 @@ app.get('/', (req, res) => {
       health: 'GET /health',
       demo_request: 'POST /api/demo/request',
       demo_list: 'GET /api/demo/requests',
-      contact: 'POST /api/contact'
+      contact: 'POST /api/contact',
+      nirf_assessment: 'POST /api/nirf/assessment',
+      nirf_assessments: 'GET /api/nirf/assessments',
+      nirf_stats: 'GET /api/nirf/stats'
     },
     setup: isDatabaseConnected ? null : {
       message: 'Database not connected. Install MySQL to enable full functionality.',

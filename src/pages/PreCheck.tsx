@@ -1,313 +1,351 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { CheckCircle, Trophy, TrendingUp, AlertCircle, Target } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { toast } from 'sonner';
+import { CheckCircle, AlertCircle, TrendingUp, Award, Users, BookOpen, Loader2, User, Mail, Phone, Building } from 'lucide-react';
+
+const questions = [
+  {
+    id: 1,
+    category: 'Teaching, Learning & Resources',
+    question: 'What is the current student-to-faculty ratio in your institution?',
+    options: [
+      { value: 'excellent', label: 'Below 15:1', score: 10 },
+      { value: 'good', label: '15:1 to 20:1', score: 8 },
+      { value: 'average', label: '20:1 to 25:1', score: 6 },
+      { value: 'poor', label: 'Above 25:1', score: 3 }
+    ]
+  },
+  {
+    id: 2,
+    category: 'Research, Innovations & Extension',
+    question: 'How many research publications has your institution produced in the last 3 years?',
+    options: [
+      { value: 'excellent', label: 'More than 100 per year', score: 10 },
+      { value: 'good', label: '50-100 per year', score: 8 },
+      { value: 'average', label: '20-50 per year', score: 6 },
+      { value: 'poor', label: 'Less than 20 per year', score: 3 }
+    ]
+  },
+  {
+    id: 3,
+    category: 'Graduation Outcomes',
+    question: 'What is your institution\'s average placement rate?',
+    options: [
+      { value: 'excellent', label: 'Above 80%', score: 10 },
+      { value: 'good', label: '60-80%', score: 8 },
+      { value: 'average', label: '40-60%', score: 6 },
+      { value: 'poor', label: 'Below 40%', score: 3 }
+    ]
+  },
+  {
+    id: 4,
+    category: 'Outreach and Inclusivity',
+    question: 'What percentage of students belong to economically weaker sections?',
+    options: [
+      { value: 'excellent', label: 'More than 30%', score: 10 },
+      { value: 'good', label: '20-30%', score: 8 },
+      { value: 'average', label: '10-20%', score: 6 },
+      { value: 'poor', label: 'Less than 10%', score: 3 }
+    ]
+  },
+  {
+    id: 5,
+    category: 'Perception',
+    question: 'How would you rate your institution\'s reputation among employers?',
+    options: [
+      { value: 'excellent', label: 'Excellent - Top choice for recruiters', score: 10 },
+      { value: 'good', label: 'Good - Regular recruitment visits', score: 8 },
+      { value: 'average', label: 'Average - Moderate employer interest', score: 6 },
+      { value: 'poor', label: 'Poor - Limited employer recognition', score: 3 }
+    ]
+  }
+];
 
 export default function PreCheck() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState<{ [key: number]: string }>({});
+  const [answers, setAnswers] = useState<Record<number, any>>({});
   const [showResults, setShowResults] = useState(false);
+  const [showContactForm, setShowContactForm] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [contactData, setContactData] = useState({
+    name: '',
+    email: '',
+    contact_number: '',
+    college_name: ''
+  });
 
-  const questions = [
-    {
-      id: 1,
-      title: "Faculty–Student Ratio & Qualification",
-      question: "What best describes your faculty profile?",
-      options: [
-        { value: "A", text: "Faculty–student ratio ≤1:10 and >80% Ph.D. holders", points: 10 },
-        { value: "B", text: "Ratio 1:11–15 and 60–80% Ph.D. holders", points: 8 },
-        { value: "C", text: "Ratio 1:16–20 and 40–60% Ph.D. holders", points: 5 },
-        { value: "D", text: "Ratio >1:20 and <40% Ph.D. holders", points: 2 }
-      ]
-    },
-    {
-      id: 2,
-      title: "Research & Publications",
-      question: "How active is your research and publication output?",
-      options: [
-        { value: "A", text: ">1.5 publications per faculty/year, patents filed, funded projects", points: 10 },
-        { value: "B", text: "1–1.5 publications per faculty/year, some projects/patents", points: 8 },
-        { value: "C", text: "<1 publication per faculty/year, limited research", points: 5 },
-        { value: "D", text: "Minimal or no research output", points: 2 }
-      ]
-    },
-    {
-      id: 3,
-      title: "Placement & Higher Studies",
-      question: "How strong are your placement and higher-study outcomes?",
-      options: [
-        { value: "A", text: ">85% of eligible students placed or pursuing higher studies", points: 10 },
-        { value: "B", text: "70–85% placed or higher studies", points: 8 },
-        { value: "C", text: "50–70% placed or higher studies", points: 5 },
-        { value: "D", text: "<50% placed or higher studies", points: 2 }
-      ]
-    },
-    {
-      id: 4,
-      title: "Industry Collaboration",
-      question: "How strong is your connection with industry?",
-      options: [
-        { value: "A", text: ">15 active MoUs, funded consultancy, internships, startup tie-ups", points: 10 },
-        { value: "B", text: "8–15 MoUs, some internships and live projects", points: 8 },
-        { value: "C", text: "3–7 MoUs, limited collaboration", points: 5 },
-        { value: "D", text: "Very few or no industry collaborations", points: 2 }
-      ]
-    },
-    {
-      id: 5,
-      title: "Infrastructure & Learning Resources",
-      question: "How modern and accessible are your academic facilities?",
-      options: [
-        { value: "A", text: "Smart classrooms, 100% ICT-enabled labs, digital library access", points: 10 },
-        { value: "B", text: "75–99% ICT-enabled, good maintenance", points: 8 },
-        { value: "C", text: "50–75% ICT-enabled, moderate upkeep", points: 5 },
-        { value: "D", text: "Limited smart facilities, outdated resources", points: 2 }
-      ]
-    },
-    {
-      id: 6,
-      title: "Research & Innovation Ecosystem",
-      question: "How strong is your innovation and R&D culture?",
-      options: [
-        { value: "A", text: "Recognized research centers, incubation hub, consistent IPR", points: 10 },
-        { value: "B", text: "Active innovation cell, startup activities, few patents/projects", points: 8 },
-        { value: "C", text: "Basic innovation cell, limited initiatives", points: 5 },
-        { value: "D", text: "No structured R&D or innovation ecosystem", points: 2 }
-      ]
-    },
-    {
-      id: 7,
-      title: "Inclusivity & Diversity",
-      question: "How inclusive is your campus in terms of gender, region, and support?",
-      options: [
-        { value: "A", text: ">40% female students, >20% from other states, 50% scholarship coverage", points: 10 },
-        { value: "B", text: "30–40% female, 10–20% other states, 25–50% scholarships", points: 8 },
-        { value: "C", text: "Limited diversity, <25% scholarships", points: 5 },
-        { value: "D", text: "Very low diversity or inclusivity measures", points: 2 }
-      ]
-    },
-    {
-      id: 8,
-      title: "Teaching & Learning Practices",
-      question: "How effective are your teaching and evaluation systems?",
-      options: [
-        { value: "A", text: "Outcome-Based Education (OBE) fully implemented, regular review", points: 10 },
-        { value: "B", text: "OBE partially implemented, moderate feedback system", points: 8 },
-        { value: "C", text: "Traditional teaching, limited feedback", points: 5 },
-        { value: "D", text: "No structured learning outcome system", points: 2 }
-      ]
-    },
-    {
-      id: 9,
-      title: "Alumni & Employer Perception",
-      question: "How strong is your alumni and employer reputation?",
-      options: [
-        { value: "A", text: "Active alumni network, strong employer participation", points: 10 },
-        { value: "B", text: "Moderately active alumni & good recruiter relations", points: 8 },
-        { value: "C", text: "Limited alumni connection, average recruiter engagement", points: 5 },
-        { value: "D", text: "Weak alumni network, poor employer perception", points: 2 }
-      ]
-    },
-    {
-      id: 10,
-      title: "Digital Presence & Institutional Visibility",
-      question: "How visible is your institution in media and online platforms?",
-      options: [
-        { value: "A", text: "High online visibility, active website, awards/rankings covered", points: 10 },
-        { value: "B", text: "Good website & moderate social media presence", points: 8 },
-        { value: "C", text: "Basic online visibility, minimal outreach", points: 5 },
-        { value: "D", text: "Outdated website, poor online presence", points: 2 }
-      ]
-    }
-  ];
-
-  const calculateScore = () => {
-    let totalScore = 0;
-    questions.forEach((question) => {
-      const answer = answers[question.id];
-      if (answer) {
-        const selectedOption = question.options.find(opt => opt.value === answer);
-        if (selectedOption) {
-          totalScore += selectedOption.points;
-        }
-      }
-    });
-    return totalScore;
-  };
-
-  const getReadinessLevel = (score: number) => {
-    if (score >= 85) {
-      return {
-        level: "Excellent – NIRF Ready",
-        rankBand: "Top 100",
-        color: "bg-green-500",
-        icon: Trophy,
-        description: "Your institution demonstrates excellence across all NIRF parameters and is ready for top rankings."
-      };
-    } else if (score >= 70) {
-      return {
-        level: "Strong – Focus on Research & Outreach",
-        rankBand: "100–200",
-        color: "bg-blue-500",
-        icon: TrendingUp,
-        description: "Strong foundation with room for improvement in research output and institutional outreach."
-      };
-    } else if (score >= 50) {
-      return {
-        level: "Average – Improve Outcomes & Perception",
-        rankBand: "200–300",
-        color: "bg-yellow-500",
-        icon: Target,
-        description: "Moderate performance. Focus on improving graduation outcomes and employer perception."
-      };
-    } else if (score >= 30) {
-      return {
-        level: "Developing – Needs Major Improvement",
-        rankBand: "300+",
-        color: "bg-orange-500",
-        icon: AlertCircle,
-        description: "Significant improvements needed across multiple parameters to achieve NIRF ranking."
-      };
-    } else {
-      return {
-        level: "Foundational Stage",
-        rankBand: "Unranked",
-        color: "bg-red-500",
-        icon: AlertCircle,
-        description: "Institution needs comprehensive development across all NIRF parameters."
-      };
-    }
-  };
-
-  const handleAnswerChange = (value: string) => {
+  const handleAnswer = (questionId: number, option: any) => {
     setAnswers(prev => ({
       ...prev,
-      [questions[currentQuestion].id]: value
+      [questionId]: option
     }));
   };
 
-  const nextQuestion = () => {
+  const handleNext = () => {
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(prev => prev + 1);
     } else {
-      setShowResults(true);
+      // Last question answered, show contact form popup
+      setShowContactForm(true);
     }
   };
 
-  const prevQuestion = () => {
+  const handlePrevious = () => {
     if (currentQuestion > 0) {
       setCurrentQuestion(prev => prev - 1);
     }
   };
 
-  const resetAssessment = () => {
-    setCurrentQuestion(0);
-    setAnswers({});
-    setShowResults(false);
+  const calculateResults = () => {
+    const totalScore = Object.values(answers).reduce((sum: number, answer: any) => sum + answer.score, 0);
+    const maxScore = questions.length * 10;
+    const percentage = (totalScore / maxScore) * 100;
+
+    let readinessLevel = '';
+    let rankBand = '';
+    let recommendations = [];
+
+    if (percentage >= 80) {
+      readinessLevel = 'Excellent - NIRF Ready';
+      rankBand = 'Top 50 potential';
+      recommendations = [
+        'Apply for NIRF ranking immediately',
+        'Focus on maintaining current standards',
+        'Enhance research output for better ranking'
+      ];
+    } else if (percentage >= 60) {
+      readinessLevel = 'Good - Nearly Ready';
+      rankBand = 'Top 100-200 potential';
+      recommendations = [
+        'Improve student-faculty ratio',
+        'Increase research publications',
+        'Enhance placement activities'
+      ];
+    } else if (percentage >= 40) {
+      readinessLevel = 'Average - Needs Improvement';
+      rankBand = 'Top 200+ potential';
+      recommendations = [
+        'Significant improvements needed in all areas',
+        'Focus on faculty development',
+        'Establish industry partnerships'
+      ];
+    } else {
+      readinessLevel = 'Poor - Major Improvements Required';
+      rankBand = 'Not ready for NIRF';
+      recommendations = [
+        'Complete overhaul of academic processes needed',
+        'Invest in faculty recruitment and training',
+        'Develop research infrastructure'
+      ];
+    }
+
+    return {
+      totalScore,
+      maxScore,
+      percentage: Math.round(percentage),
+      readinessLevel,
+      rankBand,
+      recommendations
+    };
+  };
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validate contact form
+    if (!contactData.name || !contactData.email || !contactData.college_name) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(contactData.email)) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const results = calculateResults();
+      
+      // Prepare data for backend
+      const assessmentData = {
+        institution_name: contactData.college_name,
+        contact_email: contactData.email,
+        contact_name: contactData.name,
+        contact_number: contactData.contact_number,
+        total_score: results.totalScore,
+        readiness_level: results.readinessLevel,
+        rank_band: results.rankBand,
+        answers: answers
+      };
+
+      // Submit to backend API
+      const response = await fetch('http://localhost:5000/api/nirf/assessment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(assessmentData)
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        toast.success('Assessment submitted successfully!');
+        setShowContactForm(false);
+        setShowResults(true);
+      } else {
+        toast.error(result.message || 'Failed to submit assessment');
+      }
+    } catch (error) {
+      console.error('Error submitting assessment:', error);
+      toast.error('Network error. Please try again.');
+      // Still show results even if backend fails
+      setShowContactForm(false);
+      setShowResults(true);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleContactInputChange = (field: string, value: string) => {
+    setContactData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   const progress = ((currentQuestion + 1) / questions.length) * 100;
-  const totalScore = calculateScore();
-  const readiness = getReadinessLevel(totalScore);
-  const ReadinessIcon = readiness.icon;
+  const currentQ = questions[currentQuestion];
+  const isAnswered = answers[currentQ.id];
+  const results = showResults ? calculateResults() : null;
 
-  if (showResults) {
+  if (showResults && results) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50 py-12">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12">
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-4xl">
-            <div className="text-center mb-8">
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">
-                NIRF Readiness Assessment Results
-              </h1>
-              <p className="text-xl text-gray-600">
-                Your institutional readiness for NIRF ranking
-              </p>
-            </div>
-
             <Card className="mb-8">
               <CardHeader className="text-center">
-                <div className={`w-24 h-24 ${readiness.color} rounded-full flex items-center justify-center mx-auto mb-4`}>
-                  <ReadinessIcon className="w-12 h-12 text-white" />
-                </div>
-                <CardTitle className="text-3xl font-bold text-gray-900">
-                  {totalScore}/100 Points
+                <CardTitle className="flex items-center justify-center text-3xl">
+                  <Award className="mr-3 h-8 w-8 text-yellow-600" />
+                  NIRF Readiness Assessment Results
                 </CardTitle>
                 <CardDescription className="text-lg">
-                  <Badge className={`${readiness.color} text-white text-sm px-3 py-1`}>
-                    {readiness.level}
-                  </Badge>
+                  Based on your responses, here's your institution's NIRF readiness analysis
                 </CardDescription>
               </CardHeader>
-              <CardContent className="text-center">
-                <div className="mb-6">
-                  <p className="text-lg font-semibold text-gray-700 mb-2">
-                    Indicative NIRF Rank Band: <span className="text-purple-600">{readiness.rankBand}</span>
-                  </p>
-                  <p className="text-gray-600 max-w-2xl mx-auto">
-                    {readiness.description}
-                  </p>
+              <CardContent className="space-y-8">
+                {/* Score Overview */}
+                <div className="grid gap-6 md:grid-cols-3">
+                  <Card className="text-center">
+                    <CardContent className="pt-6">
+                      <div className="text-4xl font-bold text-blue-600">{results.percentage}%</div>
+                      <p className="text-sm text-gray-600">Overall Score</p>
+                      <p className="text-xs text-gray-500">{results.totalScore}/{results.maxScore} points</p>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="text-center">
+                    <CardContent className="pt-6">
+                      <div className="text-lg font-semibold text-green-600">{results.readinessLevel}</div>
+                      <p className="text-sm text-gray-600">Readiness Level</p>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="text-center">
+                    <CardContent className="pt-6">
+                      <div className="text-lg font-semibold text-purple-600">{results.rankBand}</div>
+                      <p className="text-sm text-gray-600">Potential Ranking</p>
+                    </CardContent>
+                  </Card>
                 </div>
-                
-                <div className="grid gap-4 md:grid-cols-2 mb-8">
-                  <div className="text-center p-4 bg-gray-50 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-2">Completed Questions</h3>
-                    <p className="text-2xl font-bold text-purple-600">
-                      {Object.keys(answers).length}/10
-                    </p>
+
+                {/* Progress Bar */}
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>NIRF Readiness Score</span>
+                    <span>{results.percentage}%</span>
                   </div>
-                  <div className="text-center p-4 bg-gray-50 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-2">Average Score per Question</h3>
-                    <p className="text-2xl font-bold text-purple-600">
-                      {Object.keys(answers).length > 0 ? (totalScore / Object.keys(answers).length).toFixed(1) : 0}/10
-                    </p>
+                  <Progress value={results.percentage} className="h-3" />
+                </div>
+
+                {/* Category Breakdown */}
+                <div>
+                  <h3 className="mb-4 text-xl font-semibold">Category-wise Performance</h3>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {questions.map((q, index) => {
+                      const answer = answers[q.id];
+                      const scorePercentage = (answer?.score / 10) * 100;
+                      return (
+                        <Card key={q.id}>
+                          <CardContent className="pt-4">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <p className="font-medium">{q.category}</p>
+                                <p className="text-sm text-gray-600">{answer?.label}</p>
+                              </div>
+                              <div className="text-right">
+                                <div className="text-lg font-bold">{answer?.score}/10</div>
+                                <Progress value={scorePercentage} className="mt-1 w-20" />
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <Button 
-                    onClick={resetAssessment}
-                    className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3"
-                  >
-                    Retake Assessment
-                  </Button>
-                  <div className="text-sm text-gray-500">
-                    <p>Want to improve your NIRF ranking? Contact our experts for personalized guidance.</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                {/* Recommendations */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <TrendingUp className="mr-2 h-5 w-5" />
+                      Recommendations for Improvement
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2">
+                      {results.recommendations.map((rec, index) => (
+                        <li key={index} className="flex items-start">
+                          <CheckCircle className="mr-2 mt-0.5 h-4 w-4 flex-shrink-0 text-green-500" />
+                          <span>{rec}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
 
-            {/* Detailed Breakdown */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Detailed Parameter Breakdown</CardTitle>
-                <CardDescription>Your scores across all NIRF parameters</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {questions.map((question) => {
-                    const answer = answers[question.id];
-                    const selectedOption = answer ? question.options.find(opt => opt.value === answer) : null;
-                    const score = selectedOption ? selectedOption.points : 0;
-                    
-                    return (
-                      <div key={question.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                        <div className="flex-1">
-                          <h4 className="font-medium text-gray-900">{question.title}</h4>
-                          <p className="text-sm text-gray-600">{selectedOption?.text || "Not answered"}</p>
-                        </div>
-                        <div className="text-right">
-                          <span className="text-lg font-bold text-purple-600">{score}/10</span>
-                        </div>
+                {/* Call to Action */}
+                <Card className="bg-blue-50">
+                  <CardContent className="pt-6">
+                    <div className="text-center">
+                      <h3 className="mb-2 text-xl font-semibold">Ready to Improve Your NIRF Ranking?</h3>
+                      <p className="mb-4 text-gray-600">
+                        Our experts can help you implement these recommendations and achieve better rankings.
+                      </p>
+                      <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+                        <Button onClick={() => window.location.href = '/request-demo'} className="bg-blue-600 hover:bg-blue-700">
+                          <Award className="mr-2 h-4 w-4" />
+                          Get Expert Consultation
+                        </Button>
+                        <Button variant="outline" onClick={() => window.location.reload()}>
+                          Retake Assessment
+                        </Button>
                       </div>
-                    );
-                  })}
-                </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </CardContent>
             </Card>
           </div>
@@ -317,81 +355,186 @@ export default function PreCheck() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12">
       <div className="container mx-auto px-4">
-        <div className="mx-auto max-w-4xl">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              NIRF Readiness Assessment
-            </h1>
-            <p className="text-xl text-gray-600 mb-6">
-              Evaluate your institution's readiness for NIRF ranking across 10 key parameters
+        <div className="mx-auto max-w-3xl">
+          {/* Header */}
+          <div className="mb-8 text-center">
+            <h1 className="mb-4 text-4xl font-bold text-gray-900">NIRF Readiness Assessment</h1>
+            <p className="text-xl text-gray-600">
+              Evaluate your institution's readiness for NIRF ranking
             </p>
-            <div className="mb-4">
-              <Progress value={progress} className="h-3" />
-              <p className="text-sm text-gray-500 mt-2">
-                Question {currentQuestion + 1} of {questions.length}
-              </p>
-            </div>
+            <p className="mt-2 text-sm text-gray-500">
+              Answer {questions.length} questions to get your personalized readiness report
+            </p>
           </div>
 
-          <Card className="mb-8">
+          {/* Progress */}
+          <div className="mb-8">
+            <div className="flex justify-between text-sm text-gray-600">
+              <span>Question {currentQuestion + 1} of {questions.length}</span>
+              <span>{Math.round(progress)}% Complete</span>
+            </div>
+            <Progress value={progress} className="mt-2" />
+          </div>
+
+          {/* Question Card */}
+          <Card>
             <CardHeader>
-              <div className="flex items-center justify-between">
-                <Badge variant="outline" className="text-purple-600 border-purple-600">
-                  Parameter {questions[currentQuestion].id}
-                </Badge>
-                <span className="text-sm text-gray-500">
-                  {currentQuestion + 1}/{questions.length}
-                </span>
+              <div className="flex items-center text-sm text-blue-600">
+                <BookOpen className="mr-2 h-4 w-4" />
+                {currentQ.category}
               </div>
-              <CardTitle className="text-2xl font-bold text-gray-900">
-                {questions[currentQuestion].title}
-              </CardTitle>
-              <CardDescription className="text-lg">
-                {questions[currentQuestion].question}
-              </CardDescription>
+              <CardTitle className="text-xl">{currentQ.question}</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-6">
               <RadioGroup
-                value={answers[questions[currentQuestion].id] || ""}
-                onValueChange={handleAnswerChange}
-                className="space-y-4"
+                value={answers[currentQ.id]?.value || ''}
+                onValueChange={(value) => {
+                  const option = currentQ.options.find(opt => opt.value === value);
+                  if (option) {
+                    handleAnswer(currentQ.id, option);
+                  }
+                }}
               >
-                {questions[currentQuestion].options.map((option) => (
-                  <div key={option.value} className="flex items-start space-x-3 p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                    <RadioGroupItem value={option.value} id={option.value} className="mt-1" />
+                {currentQ.options.map((option) => (
+                  <div key={option.value} className="flex items-center space-x-3 rounded-lg border p-4 hover:bg-gray-50">
+                    <RadioGroupItem value={option.value} id={option.value} />
                     <Label htmlFor={option.value} className="flex-1 cursor-pointer">
-                      <div className="flex items-center justify-between">
-                        <span className="text-gray-900">{option.text}</span>
-                        <Badge variant="secondary" className="ml-2">
-                          {option.points} pts
-                        </Badge>
+                      <div className="flex justify-between">
+                        <span>{option.label}</span>
+                        <span className="text-sm text-gray-500">{option.score} points</span>
                       </div>
                     </Label>
                   </div>
                 ))}
               </RadioGroup>
+
+              <div className="flex justify-between">
+                <Button
+                  variant="outline"
+                  onClick={handlePrevious}
+                  disabled={currentQuestion === 0}
+                >
+                  Previous
+                </Button>
+                <Button
+                  onClick={handleNext}
+                  disabled={!isAnswered}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  {currentQuestion === questions.length - 1 ? 'Get Results' : 'Next'}
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
-          <div className="flex justify-between">
-            <Button
-              onClick={prevQuestion}
-              disabled={currentQuestion === 0}
-              variant="outline"
-              className="px-8 py-3"
-            >
-              Previous
-            </Button>
-            <Button
-              onClick={nextQuestion}
-              disabled={!answers[questions[currentQuestion].id]}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3"
-            >
-              {currentQuestion === questions.length - 1 ? 'View Results' : 'Next Question'}
-            </Button>
-          </div>
+          {/* Contact Form Dialog */}
+          <Dialog open={showContactForm} onOpenChange={setShowContactForm}>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle className="flex items-center text-xl">
+                  <Award className="mr-2 h-5 w-5 text-blue-600" />
+                  To Know Your Result, Please Let Us Know
+                </DialogTitle>
+                <DialogDescription>
+                  Please provide your contact details to receive your personalized NIRF readiness report
+                </DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleContactSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="flex items-center">
+                    <User className="mr-2 h-4 w-4" />
+                    Name *
+                  </Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="Enter your full name"
+                    value={contactData.name}
+                    onChange={(e) => handleContactInputChange('name', e.target.value)}
+                    required
+                    disabled={isSubmitting}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="flex items-center">
+                    <Mail className="mr-2 h-4 w-4" />
+                    Email Address *
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="your.email@college.edu"
+                    value={contactData.email}
+                    onChange={(e) => handleContactInputChange('email', e.target.value)}
+                    required
+                    disabled={isSubmitting}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="contact" className="flex items-center">
+                    <Phone className="mr-2 h-4 w-4" />
+                    Contact Number
+                  </Label>
+                  <Input
+                    id="contact"
+                    type="tel"
+                    placeholder="+91-9876543210"
+                    value={contactData.contact_number}
+                    onChange={(e) => handleContactInputChange('contact_number', e.target.value)}
+                    disabled={isSubmitting}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="college" className="flex items-center">
+                    <Building className="mr-2 h-4 w-4" />
+                    College Name *
+                  </Label>
+                  <Input
+                    id="college"
+                    type="text"
+                    placeholder="Enter your institution name"
+                    value={contactData.college_name}
+                    onChange={(e) => handleContactInputChange('college_name', e.target.value)}
+                    required
+                    disabled={isSubmitting}
+                  />
+                </div>
+
+                <div className="flex justify-end space-x-2 pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowContactForm(false)}
+                    disabled={isSubmitting}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="bg-blue-600 hover:bg-blue-700"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Submitting...
+                      </>
+                    ) : (
+                      <>
+                        <Award className="mr-2 h-4 w-4" />
+                        Get My Results
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </div>
