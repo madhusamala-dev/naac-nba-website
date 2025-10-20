@@ -34,11 +34,11 @@ router.post('/assessment', async (req, res) => {
       });
     }
 
-    // Validate score range
-    if (total_score < 0 || total_score > 50) {
+    // Validate score range (updated for 100 points total)
+    if (total_score < 0 || total_score > 100) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid total score. Must be between 0 and 50'
+        message: 'Invalid total score. Must be between 0 and 100'
       });
     }
 
@@ -92,11 +92,11 @@ router.post('/assessment', async (req, res) => {
       readiness_level,
       rank_band,
       answers,
-      percentage: Math.round((total_score / 50) * 100)
+      percentage: Math.round((total_score / 100) * 100)
     };
 
-    // Send results email to user
-    const userEmailTemplate = emailTemplates.nirfAssessmentResults(emailData);
+    // Send thank you email with results to user
+    const userEmailTemplate = emailTemplates.nirfAssessmentThankYou(emailData);
     const userEmailResult = await sendEmail({
       to: contact_email,
       subject: userEmailTemplate.subject,
@@ -104,8 +104,8 @@ router.post('/assessment', async (req, res) => {
       text: userEmailTemplate.text
     });
 
-    // Send notification email to admin
-    const adminEmailTemplate = emailTemplates.nirfAssessmentNotification(emailData);
+    // Send notification email to admin with lead details
+    const adminEmailTemplate = emailTemplates.nirfAssessmentAdminNotification(emailData);
     const adminEmailResult = await sendEmail({
       to: process.env.ADMIN_EMAIL,
       subject: adminEmailTemplate.subject,
@@ -170,7 +170,7 @@ router.get('/assessments', async (req, res) => {
       });
     }
 
-    const { readiness_level, limit = 50, offset = 0 } = req.query;
+    const { readiness_level, rank_band, min_score, max_score, limit = 50, offset = 0 } = req.query;
 
     let query = 'SELECT * FROM nirf_assessments WHERE 1=1';
     const params = [];
@@ -178,6 +178,21 @@ router.get('/assessments', async (req, res) => {
     if (readiness_level) {
       query += ' AND readiness_level LIKE ?';
       params.push(`%${readiness_level}%`);
+    }
+
+    if (rank_band) {
+      query += ' AND rank_band = ?';
+      params.push(rank_band);
+    }
+
+    if (min_score) {
+      query += ' AND total_score >= ?';
+      params.push(parseInt(min_score));
+    }
+
+    if (max_score) {
+      query += ' AND total_score <= ?';
+      params.push(parseInt(max_score));
     }
 
     query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
@@ -198,6 +213,21 @@ router.get('/assessments', async (req, res) => {
     if (readiness_level) {
       countQuery += ' AND readiness_level LIKE ?';
       countParams.push(`%${readiness_level}%`);
+    }
+
+    if (rank_band) {
+      countQuery += ' AND rank_band = ?';
+      countParams.push(rank_band);
+    }
+
+    if (min_score) {
+      countQuery += ' AND total_score >= ?';
+      countParams.push(parseInt(min_score));
+    }
+
+    if (max_score) {
+      countQuery += ' AND total_score <= ?';
+      countParams.push(parseInt(max_score));
     }
 
     const [countResult] = await pool.execute(countQuery, countParams);
@@ -243,15 +273,43 @@ router.get('/stats', async (req, res) => {
       SELECT 
         readiness_level,
         COUNT(*) as count,
-        ROUND(AVG(total_score), 2) as avg_score
+        ROUND(AVG(total_score), 2) as avg_score,
+        MIN(total_score) as min_score,
+        MAX(total_score) as max_score
       FROM nirf_assessments 
       GROUP BY readiness_level
       ORDER BY avg_score DESC
     `);
 
+    // Get rank band distribution
+    const [rankBandStats] = await pool.execute(`
+      SELECT 
+        rank_band,
+        COUNT(*) as count,
+        ROUND(AVG(total_score), 2) as avg_score
+      FROM nirf_assessments 
+      GROUP BY rank_band
+      ORDER BY 
+        CASE rank_band
+          WHEN 'Top 100' THEN 1
+          WHEN '100–200' THEN 2
+          WHEN '200–300' THEN 3
+          WHEN '300+' THEN 4
+          WHEN 'Unranked' THEN 5
+          ELSE 6
+        END
+    `);
+
     // Get recent assessments
     const [recentAssessments] = await pool.execute(`
-      SELECT institution_name, total_score, readiness_level, created_at
+      SELECT 
+        institution_name, 
+        contact_name,
+        contact_email,
+        total_score, 
+        readiness_level, 
+        rank_band,
+        created_at
       FROM nirf_assessments 
       ORDER BY created_at DESC 
       LIMIT 10
@@ -261,15 +319,30 @@ router.get('/stats', async (req, res) => {
     const [scoreStats] = await pool.execute(`
       SELECT 
         CASE 
-          WHEN total_score >= 40 THEN 'Excellent (40-50)'
-          WHEN total_score >= 30 THEN 'Good (30-39)'
-          WHEN total_score >= 20 THEN 'Average (20-29)'
-          ELSE 'Poor (0-19)'
+          WHEN total_score >= 85 THEN 'Excellent (85-100)'
+          WHEN total_score >= 70 THEN 'Strong (70-84)'
+          WHEN total_score >= 50 THEN 'Average (50-69)'
+          WHEN total_score >= 30 THEN 'Developing (30-49)'
+          ELSE 'Foundational (<30)'
         END as score_range,
-        COUNT(*) as count
+        COUNT(*) as count,
+        ROUND(AVG(total_score), 2) as avg_score
       FROM nirf_assessments 
       GROUP BY score_range
       ORDER BY MIN(total_score) DESC
+    `);
+
+    // Get monthly trends (last 12 months)
+    const [monthlyTrends] = await pool.execute(`
+      SELECT 
+        DATE_FORMAT(created_at, '%Y-%m') as month,
+        COUNT(*) as assessments,
+        ROUND(AVG(total_score), 2) as avg_score
+      FROM nirf_assessments 
+      WHERE created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+      GROUP BY DATE_FORMAT(created_at, '%Y-%m')
+      ORDER BY month DESC
+      LIMIT 12
     `);
 
     res.json({
@@ -277,8 +350,10 @@ router.get('/stats', async (req, res) => {
       data: {
         total_assessments: total,
         readiness_distribution: readinessStats,
+        rank_band_distribution: rankBandStats,
         score_distribution: scoreStats,
         recent_assessments: recentAssessments,
+        monthly_trends: monthlyTrends,
         generated_at: new Date().toISOString()
       }
     });

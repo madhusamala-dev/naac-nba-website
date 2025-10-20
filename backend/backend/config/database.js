@@ -105,16 +105,21 @@ async function createTables() {
   const createNirfAssessmentTable = `
     CREATE TABLE IF NOT EXISTS nirf_assessments (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      institution_name VARCHAR(255),
-      contact_email VARCHAR(255),
-      contact_name VARCHAR(255),
+      institution_name VARCHAR(255) NOT NULL,
+      contact_email VARCHAR(255) NOT NULL,
+      contact_name VARCHAR(255) NOT NULL,
+      contact_number VARCHAR(20),
       total_score INT NOT NULL,
       readiness_level VARCHAR(100) NOT NULL,
       rank_band VARCHAR(50) NOT NULL,
       answers JSON NOT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       INDEX idx_email (contact_email),
       INDEX idx_score (total_score),
+      INDEX idx_readiness_level (readiness_level),
+      INDEX idx_rank_band (rank_band),
+      INDEX idx_institution (institution_name),
       INDEX idx_created_at (created_at)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
   `;
