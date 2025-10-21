@@ -1,6 +1,6 @@
 const express = require('express');
 const { pool } = require('../config/database');
-const { sendEmail, emailTemplates } = require('../config/email');
+const { sendEmailGraph, emailTemplates } = require('../config/email');
 const router = express.Router();
 
 // Submit NIRF assessment
@@ -97,16 +97,18 @@ router.post('/assessment', async (req, res) => {
 
     // Send thank you email with results to user
     const userEmailTemplate = emailTemplates.nirfAssessmentThankYou(emailData);
-    const userEmailResult = await sendEmail({
+    const userEmailResult = await sendEmailGraph({
       to: contact_email,
       subject: userEmailTemplate.subject,
       html: userEmailTemplate.html,
       text: userEmailTemplate.text
     });
 
+    console.log(userEmailResult)
+
     // Send notification email to admin with lead details
     const adminEmailTemplate = emailTemplates.nirfAssessmentAdminNotification(emailData);
-    const adminEmailResult = await sendEmail({
+    const adminEmailResult = await sendEmailGraph({
       to: process.env.ADMIN_EMAIL,
       subject: adminEmailTemplate.subject,
       html: adminEmailTemplate.html,
