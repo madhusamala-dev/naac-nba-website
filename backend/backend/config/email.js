@@ -1,25 +1,26 @@
 const nodemailer = require('nodemailer');
 require('dotenv').config();
+const axios = require("axios");
 
 // Email transporter configuration for Microsoft Outlook
-const transporter = nodemailer.createTransport({
-  host: 'smtp-mail.outlook.com',
-  port: 587,
-  secure: false, // true for 465, false for other ports
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD
-  },
-  tls: {
-    ciphers: 'SSLv3',
-    rejectUnauthorized: false
-  }
-});
+// const transporter = nodemailer.createTransport({
+//   host: 'smtp-mail.outlook.com',
+//   port: 587,
+//   secure: false, // true for 465, false for other ports
+//   auth: {
+//     user: process.env.EMAIL_USER,
+//     pass: process.env.EMAIL_PASSWORD
+//   },
+//   tls: {
+//     ciphers: 'SSLv3',
+//     rejectUnauthorized: false
+//   }
+// });
 
 // Verify email configuration
 async function verifyEmailConfig() {
   try {
-    await transporter.verify();
+    // await transporter.verify();
     console.log('✅ Outlook email configuration verified');
     return true;
   } catch (error) {
@@ -34,22 +35,79 @@ async function verifyEmailConfig() {
 }
 
 // Send email function
-async function sendEmail({ to, subject, html, text }) {
-  try {
-    const mailOptions = {
-      from: `"NAAC NBA Services" <${process.env.EMAIL_USER}>`,
-      to,
-      subject,
-      html,
-      text
-    };
+// async function sendEmail({ to, subject, html, text }) {
+//   try {
+//     const mailOptions = {
+//       from: `"NAAC NBA Services" <${process.env.EMAIL_USER}>`,
+//       to,
+//       subject,
+//       html,
+//       text
+//     };
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log('✅ Email sent successfully via Outlook:', info.messageId);
-    return { success: true, messageId: info.messageId };
-  } catch (error) {
-    console.error('❌ Outlook email sending failed:', error.message);
-    return { success: false, error: error.message };
+//     const info = await transporter.sendMail(mailOptions);
+//     console.log('✅ Email sent successfully via Outlook:', info.messageId);
+//     return { success: true, messageId: info.messageId };
+//   } catch (error) {
+//     console.error('❌ Outlook email sending failed:', error.message);
+//     return { success: false, error: error.message };
+//   }
+// }
+async function getAccessToken() {
+  const url = `https://login.microsoftonline.com/${process.env.TENANT_ID}/oauth2/v2.0/token`;
+
+  const params = new URLSearchParams({
+    client_id: process.env.CLIENT_ID,
+    client_secret: process.env.CLIENT_SECRET,
+    scope: "https://graph.microsoft.com/.default offline_access",
+    grant_type: "refresh_token",
+    refresh_token: process.env.REFRESH_TOKEN,
+    redirect_uri: process.env.REDIRECT_URI,
+  });
+
+  const response = await axios.post(url, params);
+  return response.data.access_token;
+}
+
+// Function to send email via Microsoft Graph API
+async function sendEmailGraph({ to, subject, html, text }) {
+  const accessToken = await getAccessToken(); // get fresh access token
+  // console.log("Access Token:", accessToken);
+  const preview = text ? (typeof text === 'string' ? text.substring(0, 255) : String(text).substring(0, 255)) : '';
+
+  const message = {
+    message: {
+      subject: subject,
+      body: {
+        contentType: "HTML",
+        content: html,
+      },
+      bodyPreview: preview,
+      toRecipients: [{ emailAddress: { address: to } }],
+      from: {
+        emailAddress: { address: "madhu@accreditpro.in" },
+      },
+      sender: {
+        emailAddress: { address: "madhu@accreditpro.in" },
+      },
+    },
+    saveToSentItems: true,
+  };
+
+  try {
+    await axios.post("https://graph.microsoft.com/v1.0/me/sendMail", message, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+    console.log("✅ Email sent successfully via Graph API");
+    return { success: `Email sent successfully to: ${to}`  };
+  } catch (err) {
+    console.error(
+      "❌ Error sending email via Graph API:",
+      err.response?.data || err
+    );
   }
 }
 
@@ -438,8 +496,9 @@ const emailTemplates = {
 };
 
 module.exports = {
-  transporter,
+  // transporter,
   verifyEmailConfig,
-  sendEmail,
+  // sendEmail,
+  sendEmailGraph,
   emailTemplates
 };

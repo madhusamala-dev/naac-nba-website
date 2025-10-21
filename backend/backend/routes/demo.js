@@ -1,6 +1,6 @@
 const express = require('express');
 const { pool } = require('../config/database');
-const { sendEmail, emailTemplates } = require('../config/email');
+const { sendEmailGraph, emailTemplates } = require('../config/email');
 const router = express.Router();
 
 // Submit demo request
@@ -85,16 +85,18 @@ router.post('/request', async (req, res) => {
 
     // Send confirmation email to user
     const userEmailTemplate = emailTemplates.requestDemoConfirmation(emailData);
-    const userEmailResult = await sendEmail({
+    const userEmailResult = await sendEmailGraph({
       to: email,
       subject: userEmailTemplate.subject,
       html: userEmailTemplate.html,
       text: userEmailTemplate.text
     });
 
+    console.log(userEmailResult)
+
     // Send notification email to admin
     const adminEmailTemplate = emailTemplates.requestDemoNotification(emailData);
-    const adminEmailResult = await sendEmail({
+    const adminEmailResult = await sendEmailGraph({
       to: process.env.ADMIN_EMAIL,
       subject: adminEmailTemplate.subject,
       html: adminEmailTemplate.html,

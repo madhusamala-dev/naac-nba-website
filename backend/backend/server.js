@@ -3,7 +3,7 @@ const cors = require('cors');
 require('dotenv').config();
 
 const { testConnection, initializeDatabase } = require('./config/database');
-const { verifyEmailConfig } = require('./config/email');
+// const { verifyEmailConfig } = require('./config/email');
 
 // Import routes
 const demoRoutes = require('./routes/demo');
@@ -124,10 +124,10 @@ async function startServer() {
     }
 
     // Verify email configuration (non-blocking)
-    const emailConfigured = await verifyEmailConfig();
-    if (!emailConfigured) {
-      console.log('⚠️  Email not configured. Check EMAIL_USER and EMAIL_PASSWORD in .env');
-    }
+    // const emailConfigured = await verifyEmailConfig();
+    // if (!emailConfigured) {
+    //   console.log('⚠️  Email not configured. Check EMAIL_USER and EMAIL_PASSWORD in .env');
+    // }
 
     // Start server regardless of database status
     app.listen(PORT, () => {
@@ -137,7 +137,7 @@ async function startServer() {
       console.log(`📧 Admin email: ${process.env.ADMIN_EMAIL}`);
       console.log(`🔗 Health check: http://localhost:${PORT}/health`);
       console.log(`💾 Database: ${isDatabaseConnected ? '✅ Connected' : '❌ Disconnected'}`);
-      console.log(`📬 Email: ${emailConfigured ? '✅ Configured' : '❌ Not configured'}`);
+      // console.log(`📬 Email: ${emailConfigured ? '✅ Configured' : '❌ Not configured'}`);
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       
       if (!isDatabaseConnected) {
