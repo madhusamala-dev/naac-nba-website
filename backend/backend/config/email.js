@@ -2,7 +2,7 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 // Email transporter configuration for Microsoft Outlook
-const transporter = nodemailer.createTransporter({
+const transporter = nodemailer.createTransport({
   host: 'smtp-mail.outlook.com',
   port: 587,
   secure: false, // true for 465, false for other ports
